@@ -1,0 +1,7 @@
+{
+  "name": "MemoryBro - Asistente de Productividad IA",
+  "description": "Un asistente de productividad personal inteligente que convierte conversaciones naturales en tareas, recordatorios, notas y gastos organizados automáticamente.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

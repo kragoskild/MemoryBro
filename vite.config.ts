@@ -6,9 +6,10 @@ export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
       server: {
-        port: 3000,
-        host: '0.0.0.0',
-      },
+  	port: 3000,
+  	host: '0.0.0.0',
+  	allowedHosts: ['memorybro.onrender.com'], // <--- permite tu host en Render
+	},
       plugins: [react()],
       define: {
         'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY),

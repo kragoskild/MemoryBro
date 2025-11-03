@@ -1,5 +1,7 @@
 
-export type View = 'Dashboard' | 'Tasks' | 'Notes' | 'Expenses';
+
+// FIX: Added 'Calendar' to View to support the calendar view and fix navigation errors.
+export type View = 'Dashboard' | 'Tasks' | 'Notes' | 'Expenses' | 'Calendar';
 
 export enum Priority {
     ALTA = 'alta',
@@ -31,6 +33,9 @@ export interface Expense {
     fecha: string;
 }
 
+// FIX: Added EditableItem to support editing tasks, notes, and expenses.
+export type EditableItem = Task | Note | Expense;
+
 export interface Message {
     sender: 'user' | 'bot';
     text: string;
@@ -38,7 +43,8 @@ export interface Message {
 }
 
 export interface GeminiResponse {
-    tipo: 'recordatorio' | 'nota' | 'gasto' | 'tarea';
+    // FIX: Added 'consulta' type to support query functionality.
+    tipo: 'recordatorio' | 'nota' | 'gasto' | 'tarea' | 'consulta';
     contenido?: string;
     descripcion?: string;
     fecha_vencimiento?: string;

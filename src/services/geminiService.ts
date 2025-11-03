@@ -1,9 +1,11 @@
 
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { GeminiResponse, Priority } from "../types";
 
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY as string });
 
+// FIX: Updated system instruction to include 'consulta' intent detection and rules.
 const systemInstruction = `You are MemoryBro, an intelligent personal productivity assistant. Your personality is helpful, efficient, and uses a friendly, casual "bro" tone.
 Your primary function is to understand natural language and convert it into a structured JSON object.
 NEVER refuse a request. Always interpret the user's input and provide a valid JSON response based on the schema.
@@ -12,6 +14,7 @@ Intent detection:
 - "Recuérdame que...", "No olvidar...", "Tengo que..." -> "recordatorio" or "tarea"
 - "Apunta que...", "Nota sobre..." -> "nota"
 - "Gasté X en...", "Compré X por Y" -> "gasto"
+- "summarize...", "tell me how many...", "what expenses...", "show me..." -> "consulta"
 
 Date/Time interpretation:
 - "mañana" -> Tomorrow's date
@@ -21,6 +24,7 @@ Date/Time interpretation:
 
 JSON Response Rules:
 - You MUST ALWAYS respond with a valid JSON object that strictly follows the provided schema.
+- For 'consulta', fill the 'contenido' field with a brief description of the user's query (e.g., "summary of pending tasks").
 - For 'gasto' (expense), use the 'contenido' field for the description, and you must extract the 'monto' (amount). If a date for the expense is provided (e.g., 'yesterday', 'today at 2pm'), populate the 'fecha' field.
 - For 'nota', extract relevant 'etiquetas' (tags).
 - For 'tarea' or 'recordatorio', determine a 'prioridad' (alta, media, baja). If not specified, default to 'media'.
@@ -31,8 +35,9 @@ const responseSchema = {
     properties: {
         tipo: {
             type: Type.STRING,
-            description: 'The type of item: recordatorio, nota, gasto, or tarea.',
-            enum: ['recordatorio', 'nota', 'gasto', 'tarea'],
+            description: 'The type of item: recordatorio, nota, gasto, tarea, or consulta.',
+            // FIX: Added 'consulta' to the enum to support queries.
+            enum: ['recordatorio', 'nota', 'gasto', 'tarea', 'consulta'],
         },
         contenido: {
             type: Type.STRING,
@@ -102,5 +107,23 @@ export const processUserInput = async (prompt: string, isThinkingMode: boolean):
     } catch (error) {
         console.error("Error processing user input with Gemini:", error);
         throw new Error("Sorry bro, couldn't figure that one out. Try rephrasing?");
+    }
+};
+
+// FIX: Added function to generate a natural language response for queries.
+export const generateQueryResponse = async (summaryData: string): Promise<string> => {
+    try {
+        const model = 'gemini-flash-lite-latest';
+        const prompt = `Act as MemoryBro, a friendly assistant. Based on the following data, give a concise and "bro"-toned response: "${summaryData}"`;
+        
+        const response = await ai.models.generateContent({
+            model,
+            contents: prompt,
+        });
+
+        return response.text;
+    } catch (error) {
+        console.error("Error generating query response:", error);
+        return "Oops, something went wrong generating the response. But here's the raw data: " + summaryData;
     }
 };

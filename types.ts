@@ -30,6 +30,11 @@ export interface Expense {
     fecha: string;
 }
 
+export interface Settings {
+    defaultPriority: Priority;
+    defaultView: View;
+}
+
 export type EditableItem = Task | Note | Expense;
 
 export type Theme = 'light' | 'dark';

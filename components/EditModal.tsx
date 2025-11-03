@@ -7,6 +7,21 @@ interface EditModalProps {
     onUpdate: (item: EditableItem) => void;
 }
 
+// Helper function to format ISO date string to a value compatible with datetime-local input
+const formatDateForInput = (isoString?: string): string => {
+    if (!isoString) return '';
+    try {
+        const date = new Date(isoString);
+        // Adjust for timezone offset to display the correct local time in the input
+        const timezoneOffset = date.getTimezoneOffset() * 60000; // in milliseconds
+        const localDate = new Date(date.getTime() - timezoneOffset);
+        return localDate.toISOString().slice(0, 16);
+    } catch (e) {
+        return '';
+    }
+};
+
+
 const EditModal: React.FC<EditModalProps> = ({ item, onClose, onUpdate }) => {
     const [formData, setFormData] = useState(item);
 
@@ -15,8 +30,10 @@ const EditModal: React.FC<EditModalProps> = ({ item, onClose, onUpdate }) => {
     }, [item]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type } = e.target;
+        // When a datetime-local input changes, convert its value back to a full ISO string
+        const finalValue = type === 'datetime-local' && value ? new Date(value).toISOString() : value;
+        setFormData(prev => ({ ...prev, [name]: finalValue }));
     };
 
     const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,7 +68,7 @@ const EditModal: React.FC<EditModalProps> = ({ item, onClose, onUpdate }) => {
                     </div>
                     <div className="mb-4">
                         <label htmlFor="fecha_vencimiento" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Fecha de Vencimiento</label>
-                        <input type="datetime-local" id="fecha_vencimiento" name="fecha_vencimiento" value={formData.fecha_vencimiento ? formData.fecha_vencimiento.substring(0, 16) : ''} onChange={handleChange} className="w-full bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-md p-2 focus:ring-sky-500 focus:border-sky-500" />
+                        <input type="datetime-local" id="fecha_vencimiento" name="fecha_vencimiento" value={formatDateForInput(formData.fecha_vencimiento)} onChange={handleChange} className="w-full bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-md p-2 focus:ring-sky-500 focus:border-sky-500" />
                     </div>
                     <div className="mb-4">
                         <label htmlFor="prioridad" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Prioridad</label>
@@ -106,7 +123,7 @@ const EditModal: React.FC<EditModalProps> = ({ item, onClose, onUpdate }) => {
                     </div>
                      <div className="mb-4">
                         <label htmlFor="fecha" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Fecha</label>
-                        <input type="datetime-local" id="fecha" name="fecha" value={formData.fecha ? formData.fecha.substring(0, 16) : ''} onChange={handleChange} className="w-full bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-md p-2 focus:ring-sky-500 focus:border-sky-500" />
+                        <input type="datetime-local" id="fecha" name="fecha" value={formatDateForInput(formData.fecha)} onChange={handleChange} className="w-full bg-slate-100 dark:bg-slate-700 border-slate-300 dark:border-slate-600 rounded-md p-2 focus:ring-sky-500 focus:border-sky-500" />
                     </div>
                 </>
             );

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>MemoryBro - AI Productivity Assistant</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Añade configuración explícita para asegurar que Tailwind use la estrategia de clase.
+      tailwind.config = {
+        darkMode: 'class',
+      }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -27,7 +32,7 @@
 </script>
 <link rel="stylesheet" href="/index.css">
 </head>
-<body class="bg-slate-900 text-slate-100">
+<body>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
 </body>
